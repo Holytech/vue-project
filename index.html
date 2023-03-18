@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vue Class</title>
+    <style>
+      [v-cloak] {
+        display: none;
+      }
+      input {
+        display: block;
+        margin: 10px;
+      }
+      .box {
+        background-color: purple;
+        height: 200px;
+        width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" v-cloak>
+      <h1>{{greeting}}</h1>
+      <button @click="decrement">-</button>
+      <span>{{num}}</span>
+      <button @click="increment">+</button>
+      <hr />
+
+      <input type="text" v-model="inputValue" @keyup.enter="addList" />
+      <span>{{inputValue}}</span>
+      <h3>List</h3>
+      {{list}}
+      <hr />
+      <hr />
+
+      <button @click="toggleBox">Toggle Button</button>
+      <test-box v-if="isVisible" />
+
+      <hr />
+      <hr />
+
+      <login-form />
+    </div>
+
+    <script src="https://unpkg.com/vue@next"></script>
+    <script>
+      let app = Vue.createApp({
+        data: function () {
+          return {
+            greeting: "Hello Vue Builders",
+            num: 0,
+            inputValue: "",
+            list: "",
+            isVisible: false,
+          };
+        },
+        methods: {
+          increment() {
+            this.num++;
+          },
+          decrement() {
+            this.num--;
+          },
+          addList() {
+            this.list += this.inputValue + "\n";
+          },
+          toggleBox() {
+            this.isVisible = !this.isVisible;
+          },
+        },
+      });
+      app.component("test-box", {
+        template: `
+          <div class="box"></div>
+        `,
+      });
+      app.component("login-form", {
+        template: `
+            <form @submit.prevent="handleSubmit">
+                <h1>{{title}}</h1>
+                <custom-input
+                  v-for="(input, i) in inputs"
+                  v-model="input.value"
+                  :key="i"
+                  :label="input.label"
+                  :type="input.type"
+                />
+                <button>Log In</button>
+            </form >
+        `,
+        components: ["custom-input"],
+        data() {
+          return {
+            title: "Login Form",
+            inputs: [
+              {
+                label: "Email",
+                value: "",
+                type: "email",
+              },
+              {
+                label: "Password",
+                value: "",
+                type: "password",
+              },
+            ],
+          };
+        },
+        methods: {
+          handleSubmit() {
+            console.log(this.inputs[0].value);
+            console.log(this.inputs[1].value);
+          },
+        },
+      });
+      app.component("custom-input", {
+        template: `
+          <label>
+            {{label}}
+            <input :type="type" v-model="inputValue" />
+          </label>
+        `,
+        props: ["label", "type", "modelValue"],
+        computed: {
+          inputValue: {
+            get() {
+              return this.modelValue;
+            },
+            set(value) {
+              this.$emit("update:modelValue", value);
+            },
+          },
+        },
+        // data() {
+        //   return {
+        //     inputValue: "",
+        //   };
+        // },
+      });
+      app.mount("#app");
+    </script>
+  </body>
+</html>
